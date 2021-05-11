@@ -16,20 +16,11 @@
 #include "driver/gpio.h"
 
 /**
- * Brief:
- * This test code shows how to configure gpio and how to use gpio interrupt.
- *
  * GPIO status:
  * GPIO18: output
  * GPIO19: output
  * GPIO4:  input, pulled up, interrupt from rising edge and falling edge
- * GPIO5:  input, pulled up, interrupt from rising edge.
- *
- * Test:
- * Connect GPIO18 with GPIO4
- * Connect GPIO19 with GPIO5
- * Generate pulses on GPIO18/19, that triggers interrupt on GPIO4/5
- *
+ * GPIO5:  input, pulled up, interrupt from rising edge and falling edge
  */
 
 #define GPIO_OUTPUT_IO_0    18
@@ -72,12 +63,15 @@ static void shift_to_left(int *array, int size, int last_elem){
 	array[size -1] = last_elem;
 }
 
+// prints passed array
 static void print_array(int * array, int size) {
 	for (int i = 0; i < size; i++) {
 		printf("%d", array[i]);
 	}
 	printf("\n");
 }
+
+// return true if passed arrays are equal
 static bool compare_arrays(int * array1, int * array2, int size) {
 	int counter = size;
 	for (int i = 0; i < size; i++){
@@ -91,6 +85,7 @@ static bool compare_arrays(int * array1, int * array2, int size) {
 	}
 }
 
+// sets all items in array to 0
 static void reset_arrays(int * sensor_container, int * sensor_level_container, int size) {
 	for (int i = 0; i < size; i++) {
 		sensor_container[i] = 0;
