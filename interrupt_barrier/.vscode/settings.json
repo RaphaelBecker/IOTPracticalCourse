@@ -1,3 +1,4 @@
 {
-    "idf.port": "/dev/cu.usbserial-0215EA78"
+    "idf.port": "/dev/cu.usbserial-0215EA78",
+    "idf.flashType": "UART"
 }
