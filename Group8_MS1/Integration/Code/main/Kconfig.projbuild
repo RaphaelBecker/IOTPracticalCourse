@@ -1,0 +1,15 @@
+menu "Room Controller Configuration"
+
+    config WIFI_SSID
+        string "Wifi SSID"
+        default ""
+        help
+            Name of the 2.4GHz Wifi to connect to
+
+    config WIFI_PASS
+        string "Wifi Password"
+        default ""
+        help
+            Password for the Wifi Network
+
+endmenu

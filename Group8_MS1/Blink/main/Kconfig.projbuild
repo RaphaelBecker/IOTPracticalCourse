@@ -1,0 +1,42 @@
+menu "Blink Configuration"
+
+    config BLINK_GPIO
+        int "Blink GPIO number"
+        range 0 34
+        default 19
+        help
+            GPIO number (IOxx) to blink on and off.
+
+            Some GPIOs are used for other purposes (flash connections, etc.) and cannot be used to blink.
+
+            GPIOs 35-39 are input-only so cannot be used as outputs.
+    config BLINK_LENGTH
+        int "Blink length in ms"
+        range 0 5000
+        default 1000
+        help
+            This is the time the LED stays turned on in milliseconds.
+
+    config BLINK_FREQ
+        int "Blink frequency in ms"
+        range 0 5000
+        default 1000
+        help
+            This is the time between LED illuminations in milliseconds.
+    
+    config LED_BUTTON_GPIO
+        int "GPIO number of the LED the button should activate"
+        range 0 34
+        default 32
+        help
+            LED pin that the button should activate
+        
+    config BUTTON_GPIO
+        int "GPIO number of the Button that triggers the LED"
+        range 0 34
+        default 5
+        help
+            GPIO for the button that triggers the LED
+    
+
+endmenu
