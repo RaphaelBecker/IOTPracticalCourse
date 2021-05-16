@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <time.h>
-#include <sys/time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
@@ -14,7 +12,7 @@
 //Custom Headers
 #include "display.h"
 #include "wifiController.h"
-#include "sntp.h"
+#include "sntpController.h"
 
 
 static const char *TAG = "ROOM";
@@ -74,16 +72,16 @@ void app_main(void)
 	//pinMode(PushButton, INPUT);
 
 
-	char strftime_buf[64];
+	//char strftime_buf[64];
 	obtainTime();
 
-	ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
+	//ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
 
 	while (1)
 	{
-		strftime(strftime_buf, sizeof(strftime_buf), "%H:%M", &timeinfo);
-		displayTextTime(strftime_buf, 5);
-
+		//strftime(strftime_buf, sizeof(strftime_buf), "%H:%M", &timeinfo);
+		//displayTextTime(strftime_buf, 5);
+		vTaskDelay(10/portTICK_PERIOD_MS);
 #ifdef LED
 		/* Blink on (output high) */
 		int Push_button_state = gpio_get_level(PushButton);
