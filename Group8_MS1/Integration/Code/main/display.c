@@ -34,7 +34,7 @@ void displayTextTime(char *text, int time)
     ssd1306_clearScreen();
 }
 
-void vDisplayTask()
+void showRoomState()
 {
     while (1)
     {
@@ -45,5 +45,7 @@ void vDisplayTask()
         ssd1306_printFixedN(65, 30, displayCountPrediction, STYLE_NORMAL, 2);
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
+        ssd1306_clearScreen();
+        vTaskDelay(5000/portTICK_PERIOD_MS);
     }
 }

@@ -7,41 +7,27 @@
 #include "sntpController.h"
 #include "mqttInterface.h"
 
-
 static const char *TAG = "ROOM";
 
-#define LED_GPIO CONFIG_LED_GPIO
-
-
-
-int ledOn = 0;
-
-void toggleLED()
-{
-	if (ledOn == 0)
-	{
-		ESP_LOGI(TAG, "Turning on the LED");
-		displayText("LED On");
-		gpio_set_level(LED_GPIO, 1);
-		ledOn = 1;
-	}
-	else
-	{
-		ESP_LOGI(TAG, "Turning off the LED");
-		gpio_set_level(LED_GPIO, 0);
-		displayText("LED Off");
-		ledOn = 0;
-	}
-	//textDemo();
-}
-
-
+volatile uint8_t count = 0;
 
 void app_main(void)
 {
+	ESP_LOGI(TAG, "Boot sequence finished, starting app_main");
 
-	initDisplay();
-	//textDemo();
+	ESP_LOGI(TAG, "[APP] Startup..");
+	ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
+	ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
+
+	//Set log level
+	esp_log_level_set(TAG, ESP_LOG_INFO);
+
+	esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
+    esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
+    esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
+    esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
+    esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
+    esp_log_level_set("OUTBOX", ESP_LOG_VERBOSE);
 
 	//Initialize NVS
 	esp_err_t ret = nvs_flash_init();
@@ -52,50 +38,26 @@ void app_main(void)
 	}
 	ESP_ERROR_CHECK(ret);
 
-	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+    ESP_ERROR_CHECK(esp_netif_init());
+	ESP_ERROR_CHECK(esp_event_loop_create_default());
+	//Initialize Display
+	initDisplay();
 
+	initializeSntp();
+
+	//Connect to the Wifi Network
 	connectWifi();
 
-	//esp_log_level_set("BLINK", ESP_LOG_ERROR);
-	esp_log_level_set(TAG, ESP_LOG_INFO);
+	
 
-	//pinMode(LEDPIN, OUTPUT);
-	//pinMode(PushButton, INPUT);
-
-
-	//char strftime_buf[64];
+	//Call SNTP to sync time with server
 	obtainTime();
 
-	xTaskCreate(vDisplayTask,"Display",2048, NULL, 10, NULL);
-	xTaskCreate(vUpdateTimeStamp,"TimeStamp",1024, NULL, 5, NULL);
+	mqtt_app_start();
 
+	//Start Tasks
+	xTaskCreate(showRoomState, "DisplayRoomState", 2048, NULL, 10, NULL);
+	xTaskCreate(vUpdateTimeStamp, "TimeStamp", 1024, NULL, 5, NULL);
 
-	//mqtt_app_start();
-
-	//ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
-
-	while (1)
-	{
-		//strftime(strftime_buf, sizeof(strftime_buf), "%H:%M", &timeinfo);
-		//displayTextTime(strftime_buf, 5);
-		vTaskDelay(10/portTICK_PERIOD_MS);
-#ifdef LED
-		/* Blink on (output high) */
-		int Push_button_state = gpio_get_level(PushButton);
-		if (Push_button_state == 0)
-		{
-			toggleLED();
-			vTaskDelay(1000 / portTICK_PERIOD_MS);
-		}
-#endif
-		/*
-		
-		gpio_set_level(BLINK_GPIO, 1);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // Blink off (output low) 
-		
-		gpio_set_level(BLINK_GPIO, 0);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-		*/
-	}
+	
 }

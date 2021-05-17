@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 #include "ssd1306.h"
 
-char* groupDisplayString;// = "G08";
+char* groupDisplayString;
 char* timestampDisplayString;
 char* displayCount;
 char* displayCountPrediction;
@@ -15,5 +15,5 @@ void initDisplay();
 void textDemo();
 void displayText(char* text);
 void displayTextTime(char* text, int time);
-void vDisplayTask();
-#endif
+void showRoomState();
+#endif /* DISPLAYCONTROLLER_H */

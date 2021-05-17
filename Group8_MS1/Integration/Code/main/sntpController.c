@@ -2,12 +2,12 @@
 
 static const char *TAG = "SNTP";
 
-void time_sync_notification_cb(struct timeval *tv)
+static void time_sync_notification_cb(struct timeval *tv)
 {
     ESP_LOGI(TAG, "Notification of a time synchronization event");
 }
 
-static void initializeSntp(void)
+void initializeSntp(void)
 {
     ESP_LOGI(TAG, "Initializing SNTP");
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
@@ -21,14 +21,6 @@ static void initializeSntp(void)
 
 void obtainTime(void)
 {
-    //ESP_ERROR_CHECK( esp_event_loop_create_default() );
-
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-
-    initializeSntp();
 
     // wait for time to be set
     time_t now = 0;

@@ -9,21 +9,22 @@ menu "Room Controller Configuration"
 
     config WIFI_SSID
         string "Wifi SSID"
-        default "G-Wifi"
+        default "wifi_ssid"
         help
             Name of the 2.4GHz Wifi to connect to
 
     config WIFI_PASS
         string "Wifi Password"
-        default "QonoDatpXigv9_"
+        default "wifi_pass"
         help
             Password for the Wifi Network
 
-    config BROKER_URI
-        string "MQTT Broker URI"
-        default "mqtts://mqtt.eclipseprojects.io:8883"
+    config BROKER_URL
+        string "MQTT Broker URL"
+        default "mqtt://user1:h8y98UyhX273X6tT@iotplatform.caps.in.tum.de:1885"
         help
             URL of an mqtt broker which this example connects to.
+
         
     config BROKER_CERTIFICATE_OVERRIDE
         string "Broker certificate override"

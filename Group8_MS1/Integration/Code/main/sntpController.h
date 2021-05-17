@@ -13,8 +13,7 @@
 
 #include "display.h"
 
-
-void time_sync_notification_cb(struct timeval *tv);
+void initializeSntp(void);
 void obtainTime();
 void vUpdateTimeStamp();
 #endif
