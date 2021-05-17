@@ -16,4 +16,5 @@
 
 void time_sync_notification_cb(struct timeval *tv);
 void obtainTime();
+void vUpdateTimeStamp();
 #endif

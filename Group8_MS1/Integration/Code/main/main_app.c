@@ -1,25 +1,16 @@
-#include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "freertos/task.h"
-#include "esp_event.h"
-#include "nvs_flash.h"
-#include "driver/gpio.h"
-#include "sdkconfig.h"
-#include "esp_log.h"
 
+#include "main_app.h"
 
 //Custom Headers
 #include "display.h"
 #include "wifiController.h"
 #include "sntpController.h"
+#include "mqttInterface.h"
 
 
 static const char *TAG = "ROOM";
 
-const int LEDPIN = 32;
-const int PushButton = 5;
-const int gmtOffset_sec = 7200;
+#define LED_GPIO CONFIG_LED_GPIO
 
 
 
@@ -31,13 +22,13 @@ void toggleLED()
 	{
 		ESP_LOGI(TAG, "Turning on the LED");
 		displayText("LED On");
-		gpio_set_level(LEDPIN, 1);
+		gpio_set_level(LED_GPIO, 1);
 		ledOn = 1;
 	}
 	else
 	{
 		ESP_LOGI(TAG, "Turning off the LED");
-		gpio_set_level(LEDPIN, 0);
+		gpio_set_level(LED_GPIO, 0);
 		displayText("LED Off");
 		ledOn = 0;
 	}
@@ -50,7 +41,7 @@ void app_main(void)
 {
 
 	initDisplay();
-	textDemo();
+	//textDemo();
 
 	//Initialize NVS
 	esp_err_t ret = nvs_flash_init();
@@ -74,6 +65,12 @@ void app_main(void)
 
 	//char strftime_buf[64];
 	obtainTime();
+
+	xTaskCreate(vDisplayTask,"Display",2048, NULL, 10, NULL);
+	xTaskCreate(vUpdateTimeStamp,"TimeStamp",1024, NULL, 5, NULL);
+
+
+	//mqtt_app_start();
 
 	//ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
 

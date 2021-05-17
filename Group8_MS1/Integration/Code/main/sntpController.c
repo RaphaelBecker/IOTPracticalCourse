@@ -44,9 +44,26 @@ void obtainTime(void)
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
     time(&now);
+    setenv("TZ", "CET-1CEST", 1);
+    tzset();
+
     localtime_r(&now, &timeinfo);
+
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
-    strftime(strftime_buf, sizeof(strftime_buf), "%H:%M", &timeinfo);
-    displayTextTime(strftime_buf, 5);
+}
+
+void vUpdateTimeStamp()
+{
+    while (1)
+    {
+        time_t now = 0;
+        struct tm timeinfo = {0};
+        char strftime_buf[8];
+        time(&now);
+        localtime_r(&now, &timeinfo);
+        strftime(strftime_buf, sizeof(strftime_buf), "%H:%M", &timeinfo);
+        timestampDisplayString = strftime_buf;
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
 }
