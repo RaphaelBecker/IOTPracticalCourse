@@ -1,2 +1,2 @@
-idf_component_register(SRCS "main_app.c" "mqttInterface.c" "display.c" "wifiController.c" "sntpController.c" "mqttInterface.c"
+idf_component_register(SRCS "commands.c" "main_app.c" "mqttInterface.c" "display.c" "wifiController.c" "sntpController.c" "mqttInterface.c" "commands.c" "roomMonitoring.c"
                     INCLUDE_DIRS ".")

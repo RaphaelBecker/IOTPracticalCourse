@@ -11,4 +11,6 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 
+volatile uint8_t count;
+
 #endif

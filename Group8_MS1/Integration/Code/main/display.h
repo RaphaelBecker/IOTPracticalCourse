@@ -8,11 +8,11 @@
 
 char* groupDisplayString;
 char* timestampDisplayString;
-char* displayCount;
+char displayCount[8];
 char* displayCountPrediction;
 
 void initDisplay();
-void textDemo();
+void refreshCount();
 void displayText(char* text);
 void displayTextTime(char* text, int time);
 void showRoomState();
