@@ -12,5 +12,6 @@
 #include "esp_log.h"
 
 volatile uint8_t count;
+volatile uint8_t internalCount;
 
 #endif

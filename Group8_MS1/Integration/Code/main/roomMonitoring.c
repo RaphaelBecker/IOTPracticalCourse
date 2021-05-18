@@ -11,12 +11,15 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 
+volatile uint8_t sensorBuffer[8];
+volatile uint16_t timestampbuffer[8];
+
 //triggerPinIn = 0;
 //triggerPinOut = 2;
 
 static void IRAM_ATTR test(void* arg)
 {
-    count++;
+    internalCount++;
 }
 
 void configureRoomMonitoring()

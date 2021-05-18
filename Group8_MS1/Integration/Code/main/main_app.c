@@ -14,6 +14,7 @@ static const char *TAG = "ROOM";
 void app_main(void)
 {
 	count = 0;
+	internalCount = 0;
 	ESP_LOGI(TAG, "Boot sequence finished, starting app_main");
 
 	ESP_LOGI(TAG, "[APP] Startup..");
@@ -60,5 +61,5 @@ void app_main(void)
 	xTaskCreate(showRoomState, "DisplayRoomState", 2048, NULL, 10, NULL);
 	xTaskCreate(vUpdateTimeStamp, "TimeStamp", 1024, NULL, 5, NULL);
 	xTaskCreate(mqttPublishRestart, "PublishRestart", 2048, NULL, 5, NULL);
-
+	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 2048, NULL, 10, NULL);
 }

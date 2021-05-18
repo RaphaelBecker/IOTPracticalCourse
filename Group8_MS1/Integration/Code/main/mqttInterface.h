@@ -25,3 +25,4 @@
 void mqtt_app_start(void);
 void mqttPublishRestart();
 void mqttPublishCount();
+void mqttPublishCountTask();

@@ -44,3 +44,49 @@ menu "Room Controller Configuration"
         default 20000
 
 endmenu
+
+menu "MQTT-LoginDetails"
+    config IOT_MQTT_ADDRESS
+        string "iot platform mqtt broker uri (without port)"
+        default "mqtt://131.159.35.132"
+        help
+            self explanatory!
+    
+    config IOT_MQTT_PORT
+        int "iot platform port"
+        default 1883
+        help
+            self explanatory
+
+    config IOT_MQTT_DEVICEKEY
+        string "iot platform java token"
+        default ""
+        help
+            Access token for device to push data
+
+    config IOT_MQTT_USERNAME
+        string "mqtt username (usually JWT)"
+        default "JWT"
+        help
+            IOT MQTT broker username
+
+    config IOT_USERNAME
+        string "iot platform username"
+        default "group8_2021_ss"
+        help
+            Username that is also used to login to the webinterface
+    
+    config IOT_DEVICEID
+        int "iot platform device id"
+        default 0
+        help
+            Device ID for the device you want to push info to (obtain by downloading device key)
+
+    config IOT_USER_DEVICEID
+        string "iot platform <user>_<deviceid>"
+        default ""
+        help
+            used for the mqtt channel
+
+
+endmenu

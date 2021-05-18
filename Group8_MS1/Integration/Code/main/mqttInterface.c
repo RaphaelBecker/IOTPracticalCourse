@@ -24,7 +24,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         //ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
         msg_id = esp_mqtt_client_subscribe(client, "ROOM_EVENTS", 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-        
+
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -55,11 +55,18 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             }
             else if (event->data_len == 5 && strncmp(event->data, "enter", 5) == 0)
             {
-                enterRoom();
+                //enterRoom();
+                count++;
+                mqttPublishCount();
             }
             else if (event->data_len == 5 && strncmp(event->data, "leave", 5) == 0)
             {
-                leaveRoom();
+                //leaveRoom();
+                if (count > 0)
+                {
+                    count--;
+                }
+                mqttPublishCount();
             }
             else if (event->data_len == 11 && strncmp(event->data, "unsureEnter", 11) == 0)
             {
@@ -203,10 +210,10 @@ void mqtt_app_start(void)
 
     //Second Client for data pushing
     esp_mqtt_client_config_t mqtt_cfg2 = {
-        .uri = "mqtt://131.159.35.132",
-        .port = 1883,
-        .username = "JWT",
-        .password = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjEyNzA3MzAsImlzcyI6ImlvdHBsYXRmb3JtIiwic3ViIjoiNDRfMTE5In0.RysgI_yU-uX3TpiK-FgLMy1cVQtN3MW2OkgJCuqwzICc8oTDf2I6b14bB9_HTvwrhycgh8B7qiBezlfLGqorYqRxD1wqGsZaGqdjfz-VAOFumU5voaWuoIpJBtiKCvoJzX9-1h8odCXCwIIUp8R1cJZF69bljYIdJs--JjVD7A_L4S_0MYCrQG8mPAO-FD_Vw3_537dXIREgrU_hOayE6iPJ-oQTeeII8ct7pFI0GMMuZxmFtRdAUoLhKo_sGJZyJvPKovgMRuUPl9j8Ej2O4lYfcZOhm-sd6tMNo67hh99WLV3DMI2RFYJPocVuC54_WJK8OHHIbQnCCPOReR8Nga1bd8Jbhbj-iuJ_3c0j8TUqJ8uC6ZqSgPJjzlPkzh6OmEPa7PPCOvOIF6ade90n-d65e7DINRL6o3e4Q-S8LDI0j13XTFAqxlxrXrEXjPizaCS74Z9p2jYD2PWDqNGfxDh3-ZHoZqfaMaGzsKToTS1uk564HM1OWsahOs8wa6aa6_YnsyfHHbo0aSgJyLvmhE3E_8LsMxJdaN7gCcwvW2V05rvsPUaiIrCtaTxs-WksVrEGtJX_405OhEcARyq2g92G6p6ZptKdyBhixZtgvW7BknO_LtoRCz6VPAOdIPwOGEz61vjIdTSvhvC_suT6hRpTkKnzBVz1fRsFn_NCnDk",
+        .uri = CONFIG_IOT_MQTT_ADDRESS,
+        .port = CONFIG_IOT_MQTT_PORT,
+        .username = CONFIG_IOT_MQTT_USERNAME,
+        .password = CONFIG_IOT_MQTT_DEVICEKEY,
         .client_id = "platform-client",
     };
 
@@ -215,16 +222,52 @@ void mqtt_app_start(void)
     esp_mqtt_client_start(client);
     clientIOT = client;
 }
-#ifdef BLEH
+
 void mqttPublishCount()
 {
+    //Wait until time is synced before sending
+    long long int now = 0;
+    while (now < 1600000000)
+    {
+        time(&now);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    ESP_LOGI(TAG2, "Sending count event");
+
+    now *= 1000LL;
+
+    char buffer[128];
+    int length = sprintf(buffer, "{\"username\":\"%s\",\"count\":%d,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, count, CONFIG_IOT_DEVICEID, now);
+    int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 0, 0);
+    ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
+    printf(buffer);
+}
+
+void mqttPublishCountTask()
+{
+    //Wait until time is synced before sending
+    long long now = 0;
+    time(&now);
+
+    while (now < 1600000000)
+    {
+        time(&now);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+    struct tm timeinfo = {0};
+    //Run task every minute that sends count to iot platform at 00, 15, 30 and 45
     while (1)
     {
-        msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+        time(&now);
+        localtime_r(&now, &timeinfo);
+        if (timeinfo.tm_min == 0 || timeinfo.tm_min == 15 || timeinfo.tm_min == 30 || timeinfo.tm_min == 45)
+        {
+            mqttPublishCount();
+        }
+        vTaskDelay(60000 / portTICK_PERIOD_MS);
     }
 }
-#endif
 
 void mqttPublishRestart()
 {
@@ -236,12 +279,12 @@ void mqttPublishRestart()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     ESP_LOGI(TAG2, "Sending restart event");
-    
+
     now *= 1000LL;
 
     char buffer[128];
-    int length = sprintf(buffer, "{\"username\":\"group8_2021_ss\",\"1278\":1,\"device_id\":119,\"timestamp\":%lld}", now);
-    int msg_id = esp_mqtt_client_publish(clientIOT, "44_119", buffer, length, 2, 0);
+    int length = sprintf(buffer, "{\"username\":\"%s\",\"restart\":1,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, CONFIG_IOT_DEVICEID, now);
+    int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 0, 0);
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
     printf("\n");
