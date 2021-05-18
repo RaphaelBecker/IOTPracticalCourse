@@ -219,34 +219,37 @@ void mqtt_app_start(void)
 
     client = esp_mqtt_client_init(&mqtt_cfg2);
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler2, client);
-    esp_mqtt_client_start(client);
+    //esp_mqtt_client_start(client);
     clientIOT = client;
 }
 
 void mqttPublishCount()
 {
     //Wait until time is synced before sending
-    long long int now = 0;
+    time_t now = 0;
     while (now < 1600000000)
     {
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    esp_mqtt_client_start(clientIOT);
     ESP_LOGI(TAG2, "Sending count event");
+    long long int now_Long = (long long) now;
+    now_Long *= 1000LL;
 
-    now *= 1000LL;
-
-    char buffer[128];
-    int length = sprintf(buffer, "{\"username\":\"%s\",\"count\":%d,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, count, CONFIG_IOT_DEVICEID, now);
-    int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 0, 0);
+    char buffer[256];
+    int length = sprintf(buffer, "{\"username\":\"%s\",\"count\":%d,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, count, CONFIG_IOT_DEVICEID, now_Long);
+    int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 2, 0);
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
+    printf("\n");
+    esp_mqtt_client_stop(clientIOT);
 }
 
 void mqttPublishCountTask()
 {
     //Wait until time is synced before sending
-    long long now = 0;
+    time_t now = 0;
     time(&now);
 
     while (now < 1600000000)
@@ -272,22 +275,24 @@ void mqttPublishCountTask()
 void mqttPublishRestart()
 {
     //Wait until time is synced before sending
-    long long int now = 0;
+    time_t now = 0;
     while (now < 1600000000)
     {
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    esp_mqtt_client_start(clientIOT);
     ESP_LOGI(TAG2, "Sending restart event");
+    long long int now_Long = (long long) now;
+    now_Long *= 1000LL;
 
-    now *= 1000LL;
-
-    char buffer[128];
-    int length = sprintf(buffer, "{\"username\":\"%s\",\"restart\":1,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, CONFIG_IOT_DEVICEID, now);
+    char buffer[256];
+    int length = sprintf(buffer, "{\"username\":\"%s\",\"restart\":1,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, CONFIG_IOT_DEVICEID, now_Long);
     int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 0, 0);
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
     printf("\n");
+    esp_mqtt_client_stop(clientIOT);
     //ESP_LOGI(TAG2, payload);
     vTaskDelete(NULL);
 }

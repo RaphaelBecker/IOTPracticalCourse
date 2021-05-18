@@ -45,10 +45,10 @@ void app_main(void)
 	//Initialize Display
 	initDisplay();
 
-	initializeSntp();
-
 	//Connect to the Wifi Network
 	connectWifi();
+
+	initializeSntp();
 
 	//Call SNTP to sync time with server
 	obtainTime();
