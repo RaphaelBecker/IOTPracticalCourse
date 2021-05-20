@@ -25,7 +25,7 @@ void monitorTriggerPinFlags(){
     prev_triggerPinOutFlag = triggerPinOutFlag;
     for(;;)
     {
-        vTaskDelay(40 / portTICK_RATE_MS);
+        vTaskDelay(20 / portTICK_RATE_MS);
         if(triggerPinInFlag == prev_triggerPinInFlag + 1)
         {
             prev_triggerPinInFlag = triggerPinInFlag;
