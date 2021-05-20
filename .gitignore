@@ -1,2 +1,5 @@
 build/
 Group8_MS1/Integration/Code/sdkconfig
+Group8_MS1/Integration/Code/.vscode/c_cpp_properties.json
+Group8_MS1/Integration/Code/.vscode/settings.json
+assignments/interrupt_barrier/.vscode/settings.json
