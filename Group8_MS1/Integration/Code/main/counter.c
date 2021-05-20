@@ -65,6 +65,15 @@ void reset_arrays(uint8_t * sensor_container, uint8_t * sensor_level_container, 
 	}
 }
 
+//this function resets the containers sensor_container and sensor_level_container
+void reset_maipulated_arrays() {
+    size_t size = sizeof(sensor_container)/sizeof(sensor_container[0]);
+	for (int i = 0; i < size; i++) {
+		sensor_container[i] = 0;
+		sensor_level_container[i] = 0;
+	}
+}
+
 void detect_crossing_barrier_by_pattern(){
 	// checks for enter/exit pattern 0/1  
 	if (compare_arrays(sensor_container, sensor_enter_pattern_0, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_enter_level_pattern_0, sizeof(&sensor_container))) {
@@ -133,6 +142,11 @@ void insertSignalPinOutToArrayBuffer(){
 	shift_to_left(sensor_container, 4, triggerPinOut);
     detect_crossing_barrier_by_pattern();
 }
+void insertManipulationFlagToArrayBuffer(){ 
+	shift_to_left(sensor_level_container, 4, 3);
+	shift_to_left(sensor_container, 4, 3);
+}
+
 
 			// check for pattern recognission:
 			//detect_crossing_barrier_by_pattern(sensor_container, sensor_level_container);

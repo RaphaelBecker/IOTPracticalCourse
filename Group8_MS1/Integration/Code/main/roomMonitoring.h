@@ -4,6 +4,8 @@
 #define triggerPinIn 0
 #define triggerPinOut 2
 
+void timeWatchDog();
+void monitorTriggerPinFlags();
 void configureRoomMonitoring();
 void taskRoomMonitoring();
 

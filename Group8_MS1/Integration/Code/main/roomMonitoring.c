@@ -17,29 +17,72 @@
 volatile uint8_t sensorBuffer[8];
 volatile uint16_t timestampbuffer[8];
 static const char *TAG = "ROOM_MONITOR";
+long start;
+long stop;
+bool manipulationFlag = 0;
 
 //triggerPinIn = 0;
 //triggerPinOut = 2;
+
+void timeWatchDog()
+{ 
+    uint8_t prevIn1 = 0;
+    uint8_t prevOut1 = 0;
+    start = 0;
+    for( ;; )
+    {
+        if(triggerPinInFlag == prevIn1 + 1)
+        {
+            stop = xTaskGetTickCount();
+            if((stop - start) < 2 ){
+                printf("maipulated time detected: %ld\n", (stop - start));
+                manipulationFlag = 1;
+            }
+            start = xTaskGetTickCount();
+        } else if(triggerPinOutFlag == prevOut1 + 1){
+            stop = xTaskGetTickCount();
+            if((stop - start) < 2 ){
+                printf("maipulated time detected: %ld\n", (stop - start));
+                manipulationFlag = 1;
+            }
+            start = xTaskGetTickCount();
+        }
+        prevIn1 = triggerPinInFlag;
+        prevOut1 = triggerPinOutFlag;
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        //printf("time stoped: %ld\n", (stop - start));
+    }
+}
 
 void monitorTriggerPinFlags(){
     prev_triggerPinInFlag = triggerPinInFlag;
     prev_triggerPinOutFlag = triggerPinOutFlag;
     for(;;)
     {
-        vTaskDelay(20 / portTICK_RATE_MS);
+        vTaskDelay(10 / portTICK_RATE_MS);
         if(triggerPinInFlag == prev_triggerPinInFlag + 1)
         {
             prev_triggerPinInFlag = triggerPinInFlag;
             //debugging:
             printf("GPIO[%d] interupt, val: %d \n", triggerPinIn, gpio_get_level(triggerPinIn));
+            if(manipulationFlag == 1){
+                insertManipulationFlagToArrayBuffer();
+                manipulationFlag = 0;
+            } else {
             insertSignalPinInToArrayBuffer();
+            }
         }
         if(triggerPinOutFlag == prev_triggerPinOutFlag + 1)
         {
             prev_triggerPinOutFlag = triggerPinOutFlag;
             //debugging:
             printf("GPIO[%d] interupt, val: %d \n", triggerPinOut, gpio_get_level(triggerPinOut));
+             if(manipulationFlag == 1){
+                insertManipulationFlagToArrayBuffer();
+                manipulationFlag = 0;
+            } else {
             insertSignalPinOutToArrayBuffer();
+            }
         }
     }
 }
@@ -92,14 +135,11 @@ void configureRoomMonitoring()
     // creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
     xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
 	
-    struct timeval stop, start;
-    gettimeofday(&start, NULL);
+    //monitors the time between interrupt signals to spot manipulation
+    xTaskCreate(timeWatchDog, "timeWatchDog", 2048, NULL, 20, NULL);
 
     //executes Tests to evaluate the room counter algorithm in counter.c
     executeCountingAlgoTests();
-    
-    gettimeofday(&stop, NULL);
-    printf("took %lu us\n", (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec); 
     
     //ued for debugging:
     ESP_LOGI(TAG, "prev_triggerPinInFlag: %d", prev_triggerPinInFlag);

@@ -1,5 +1,9 @@
 {
     "idf.portWin": "COM4",
     "idf.flashType": "UART",
-    "idf.port": "/dev/cu.usbserial-0215EA78"
+    "idf.port": "/dev/cu.usbserial-0215EA78",
+    "files.associations": {
+        "algorithm": "c",
+        "random": "c"
+    }
 }
