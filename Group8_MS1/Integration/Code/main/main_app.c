@@ -48,18 +48,30 @@ void app_main(void)
 	//Connect to the Wifi Network
 	connectWifi();
 
+	//Initialize SNTP 
 	initializeSntp();
 
 	//Call SNTP to sync time with server
 	obtainTime();
-
+	
+	//starts mqtt handler
 	mqtt_app_start();
 
+	// configures room monitoring
 	configureRoomMonitoring();
 
-	//Start Tasks
+	//Start Tasks:
+	
+	//update oled display and show Room status
 	xTaskCreate(showRoomState, "DisplayRoomState", 2048, NULL, 10, NULL);
+	
+	//updates timestamp from SNTP (Simple Network Time Protocol)
 	xTaskCreate(vUpdateTimeStamp, "TimeStamp", 1024, NULL, 5, NULL);
+	
+	//publishes a restart event 
 	xTaskCreate(mqttPublishRestart, "PublishRestart", 2048, NULL, 5, NULL);
+	
+	//publishes the room count
 	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 2048, NULL, 10, NULL);
+
 }

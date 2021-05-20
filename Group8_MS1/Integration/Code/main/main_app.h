@@ -11,7 +11,12 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 
+// Room count:
 volatile uint8_t count;
 volatile uint8_t internalCount;
+uint8_t triggerPinInFlag;
+uint8_t triggerPinOutFlag;
+uint8_t prev_triggerPinOutFlag;
+uint8_t prev_triggerPinInFlag;
 
 #endif

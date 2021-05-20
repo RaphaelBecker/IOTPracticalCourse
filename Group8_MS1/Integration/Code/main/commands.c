@@ -4,6 +4,9 @@
 #include "driver/gpio.h"
 #include "roomMonitoring.h"
 
+// use for debugging:
+//printf("GPIO[%d] interupt, val: %d \n", triggerPinIn, gpio_get_level(triggerPinIn));
+
 static const char *TAG = "COMMANDS";
 
 void leaveRoom()
