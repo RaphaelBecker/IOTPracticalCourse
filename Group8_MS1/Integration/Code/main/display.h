@@ -9,7 +9,7 @@
 char* groupDisplayString;
 char* timestampDisplayString;
 char displayCount[8];
-char* displayCountPrediction;
+char displayCountPrediction[8];
 
 void initDisplay();
 void refreshCount();

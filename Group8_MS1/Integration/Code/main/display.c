@@ -10,7 +10,6 @@ void initDisplay()
 
     timestampDisplayString = "00:00";
     groupDisplayString = "G08";
-    displayCountPrediction = "00";
 
 }
 
@@ -33,6 +32,7 @@ void showRoomState()
     while (1)
     {
         sprintf(displayCount, "%02d",count);
+        sprintf(displayCountPrediction, "%02d",internalCount);
         //ssd1306_clearScreen();
         ssd1306_printFixedN(0, 0, groupDisplayString, STYLE_NORMAL, 1);
         ssd1306_printFixedN(60, 0, timestampDisplayString, STYLE_NORMAL, 1);

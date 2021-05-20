@@ -1,6 +1,8 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
+#define TESTING
+
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
