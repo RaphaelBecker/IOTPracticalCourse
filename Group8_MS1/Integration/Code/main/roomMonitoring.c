@@ -2,6 +2,7 @@
 #include "commands.h"
 #include "main_app.h"
 #include "counter.h"
+#include <sys/time.h>
 
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -31,12 +32,14 @@ void monitorTriggerPinFlags(){
             prev_triggerPinInFlag = triggerPinInFlag;
             //debugging:
             printf("GPIO[%d] interupt, val: %d \n", triggerPinIn, gpio_get_level(triggerPinIn));
+            insertSignalPinInToArrayBuffer();
         }
         if(triggerPinOutFlag == prev_triggerPinOutFlag + 1)
         {
             prev_triggerPinOutFlag = triggerPinOutFlag;
             //debugging:
             printf("GPIO[%d] interupt, val: %d \n", triggerPinOut, gpio_get_level(triggerPinOut));
+            insertSignalPinOutToArrayBuffer();
         }
     }
 }
@@ -53,8 +56,8 @@ static void IRAM_ATTR triggerPinOutHandler(void* arg)
 
 void executeCountingAlgoTests()
 {
-    leaveRoom();
     enterRoom();
+    leaveRoom();
 
     //Corner cases
     halfwayEnter();
@@ -89,8 +92,14 @@ void configureRoomMonitoring()
     // creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
     xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
 	
+    struct timeval stop, start;
+    gettimeofday(&start, NULL);
+
     //executes Tests to evaluate the room counter algorithm in counter.c
     executeCountingAlgoTests();
+    
+    gettimeofday(&stop, NULL);
+    printf("took %lu us\n", (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec); 
     
     //ued for debugging:
     ESP_LOGI(TAG, "prev_triggerPinInFlag: %d", prev_triggerPinInFlag);

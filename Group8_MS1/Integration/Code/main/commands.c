@@ -11,7 +11,7 @@ static const char *TAG = "COMMANDS";
 
 void leaveRoom()
 {
-	ESP_LOGI(TAG, "Command: Leave");
+	ESP_LOGI(TAG, "Command: Leave: -1");
 	gpio_set_level(triggerPinIn, 1);
 	vTaskDelay(100 / portTICK_RATE_MS);
 	gpio_set_level(triggerPinIn, 0);
@@ -24,7 +24,7 @@ void leaveRoom()
 
 void enterRoom()
 {
-	ESP_LOGI(TAG, "Command: Enter");
+	ESP_LOGI(TAG, "Command: Enter: +1");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(100 / portTICK_RATE_MS);
 	gpio_set_level(triggerPinOut, 0);
@@ -55,7 +55,7 @@ void halfwayEnter()
  * someone goes to the middle of the doorway, and then turns around
  * expected count result: no change
  */
-	ESP_LOGI(TAG, "Command: Half Enter");
+	ESP_LOGI(TAG, "Command: Half Enter: NO change");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(100 / portTICK_PERIOD_MS);
 	gpio_set_level(triggerPinIn, 1);
@@ -74,7 +74,7 @@ void halfwayEnter()
  */
 void breaksOuterAndInnerButReturnsG4()
 {
-	ESP_LOGI(TAG, "Command: breakOuterAndInnerButReturnsG4");
+	ESP_LOGI(TAG, "Command: breakOuterAndInnerButReturnsG4: NO change");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(200 / portTICK_PERIOD_MS);
 	gpio_set_level(triggerPinIn, 1);
@@ -99,7 +99,7 @@ void breaksOuterAndInnerButReturnsG4()
  */
 void personTurnedG9()
 {
-	ESP_LOGI(TAG, "Command: Person entered the room and turned around");
+	ESP_LOGI(TAG, "Command: Person entered the room and turned around: NO change");
 	// person entering
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -124,7 +124,7 @@ void personTurnedG9()
  */
 void unsureEnter()
 {
-	ESP_LOGI(TAG, "Command: Unsure Enter");
+	ESP_LOGI(TAG, "Command: Unsure Enter: +1");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(100 / portTICK_PERIOD_MS);
 	gpio_set_level(triggerPinIn, 1);
@@ -153,7 +153,7 @@ void unsureEnter()
  */
 void manipulationEnter()
 {
-	ESP_LOGI(TAG, "Command: Manipulation Enter ");
+	ESP_LOGI(TAG, "Command: Manipulation Enter. NO change ");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(15 / portTICK_PERIOD_MS);
 	gpio_set_level(triggerPinOut, 0);
@@ -175,7 +175,7 @@ void manipulationEnter()
  */
 void peeketoandLeaveG11()
 {
-	ESP_LOGI(TAG, "Command: Peek into and leave");
+	ESP_LOGI(TAG, "Command: Peek into and leave: -1");
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(3000 / portTICK_PERIOD_MS);
 	gpio_set_level(triggerPinOut, 0);
@@ -198,7 +198,7 @@ void peeketoandLeaveG11()
  */
 void successiveEnter()
 {
-	ESP_LOGI(TAG, "Command: Successive Enter");
+	ESP_LOGI(TAG, "Command: Successive Enter: +2");
 	// first person entering
 	gpio_set_level(triggerPinOut, 1);
 	vTaskDelay(50 / portTICK_PERIOD_MS);
