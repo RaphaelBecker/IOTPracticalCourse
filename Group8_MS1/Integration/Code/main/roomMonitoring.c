@@ -1,7 +1,7 @@
 #include "roomMonitoring.h"
 #include "commands.h"
 #include "main_app.h"
-#include "counter.h"
+//#include "counter.h"
 
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -87,10 +87,10 @@ void configureRoomMonitoring()
     gpio_isr_handler_add(triggerPinOut, triggerPinOutHandler, (void*) triggerPinOut);
 
     // creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
-    xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
+    //xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
 	
     //executes Tests to evaluate the room counter algorithm in counter.c
-    executeCountingAlgoTests();
+    //executeCountingAlgoTests();
     
     //ued for debugging:
     ESP_LOGI(TAG, "prev_triggerPinInFlag: %d", prev_triggerPinInFlag);

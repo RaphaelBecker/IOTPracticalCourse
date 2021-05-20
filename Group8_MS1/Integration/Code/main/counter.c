@@ -63,6 +63,7 @@ static void reset_arrays(int * sensor_container, int * sensor_level_container, i
 }
 
 static void detect_crossing_barrier_by_pattern(int *sensor_container, int *sensor_level_container){
+	#ifdef BLEH
 	// checks for enter/exit pattern 0/1  
 	if (compare_arrays(sensor_container, sensor_enter_pattern_0, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_enter_level_pattern_0, sizeof(&sensor_container))) {
 		printf("Enter pattern 0 recognized:\n");
@@ -109,4 +110,5 @@ static void detect_crossing_barrier_by_pattern(int *sensor_container, int *senso
 		// substract person from room!
 		count--;
 	} 
+	#endif
 }
