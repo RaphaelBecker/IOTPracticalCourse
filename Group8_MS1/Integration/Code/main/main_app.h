@@ -1,7 +1,5 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
-//Define to exclude data recording - dont wanna record data from my personal testing board
-#define TESTING
 
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
