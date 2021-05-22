@@ -4,6 +4,7 @@
     "idf.port": "/dev/cu.usbserial-0215EA78",
     "files.associations": {
         "algorithm": "c",
-        "random": "c"
+        "random": "c",
+        "*.ipp": "c"
     }
 }

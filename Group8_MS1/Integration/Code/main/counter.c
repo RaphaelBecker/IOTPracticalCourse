@@ -79,11 +79,11 @@ void detect_crossing_barrier_by_pattern(){
 	if (compare_arrays(sensor_container, sensor_enter_pattern_0, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_enter_level_pattern_0, sizeof(&sensor_container))) {
 		printf("Enter pattern 0 detected:\n");
 		// debugging:
-		print_array(sensor_container, 4);
-		print_array(sensor_level_container, 4);
-		printf("Pattern:\n");
-        print_array(sensor_enter_pattern_0, 4);
-        print_array(sensor_enter_level_pattern_0, 4);
+		//print_array(sensor_container, 4);
+		//print_array(sensor_level_container, 4);
+		//printf("Pattern:\n");
+        //print_array(sensor_enter_pattern_0, 4);
+        //print_array(sensor_enter_level_pattern_0, 4);
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
 		// add person to room:
@@ -92,11 +92,11 @@ void detect_crossing_barrier_by_pattern(){
 	} else if (compare_arrays(sensor_container, sensor_enter_pattern_1, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_enter_level_pattern_1, sizeof(&sensor_container))) {
 		printf("Enter pattern 1 detected:\n");
 		// debugging:
-		print_array(sensor_container, 4);
-		print_array(sensor_level_container, 4);
-        printf("Pattern:\n");
-        print_array(sensor_enter_pattern_1, 4);
-		print_array(sensor_enter_level_pattern_1, 4);
+		//print_array(sensor_container, 4);
+		//print_array(sensor_level_container, 4);
+        //printf("Pattern:\n");
+        //print_array(sensor_enter_pattern_1, 4);
+		//print_array(sensor_enter_level_pattern_1, 4);
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
 		// add person to room:
@@ -105,11 +105,11 @@ void detect_crossing_barrier_by_pattern(){
 	} else if (compare_arrays(sensor_container, sensor_exit_pattern_0, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_exit_level_pattern_0, sizeof(&sensor_container))) {
 		printf("Exit pattern 0 detected:\n");
 		// debugging:
-		print_array(sensor_container, 4);
-         print_array(sensor_level_container, 4);
-        printf("Pattern:\n");
-        print_array(sensor_exit_pattern_0, 4);
-		print_array(sensor_exit_level_pattern_0, 4);
+		//print_array(sensor_container, 4);
+        //print_array(sensor_level_container, 4);
+        //printf("Pattern:\n");
+        //print_array(sensor_exit_pattern_0, 4);
+		//print_array(sensor_exit_level_pattern_0, 4);
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
 		// substract person from room:
@@ -118,11 +118,11 @@ void detect_crossing_barrier_by_pattern(){
 	} else if (compare_arrays(sensor_container, sensor_exit_pattern_1, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_exit_level_pattern_1, sizeof(&sensor_container))) {
 		printf("Exit pattern 1 detected:\n");
 		// debugging:
-		print_array(sensor_container, 4);
-		print_array(sensor_level_container, 4);
-        printf("Pattern:\n");
-        print_array(sensor_exit_pattern_1, 4);
-		print_array(sensor_exit_level_pattern_1, 4);
+		//print_array(sensor_container, 4);
+		//print_array(sensor_level_container, 4);
+        //printf("Pattern:\n");
+        //print_array(sensor_exit_pattern_1, 4);
+		//print_array(sensor_exit_level_pattern_1, 4);
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
 		// substract person from room!
@@ -142,6 +142,7 @@ void insertSignalPinOutToArrayBuffer(){
 	shift_to_left(sensor_container, 4, triggerPinOut);
     detect_crossing_barrier_by_pattern();
 }
+
 void insertManipulationFlagToArrayBuffer(){ 
 	shift_to_left(sensor_level_container, 4, 3);
 	shift_to_left(sensor_container, 4, 3);

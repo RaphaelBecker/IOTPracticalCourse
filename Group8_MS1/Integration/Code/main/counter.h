@@ -12,8 +12,6 @@
 #include "freertos/queue.h"
 #include "driver/gpio.h"
 
-void test12();
-
 
 // shifts the elements of an passed array 1 int to the left
 void shift_to_left(uint8_t *array, uint8_t size, uint8_t last_elem);

@@ -13,6 +13,7 @@
 
 // Room count:
 volatile uint8_t count;
+uint8_t prev_count;
 volatile uint8_t internalCount;
 uint8_t triggerPinInFlag;
 uint8_t triggerPinOutFlag;

@@ -17,8 +17,8 @@
 volatile uint8_t sensorBuffer[8];
 volatile uint16_t timestampbuffer[8];
 static const char *TAG = "ROOM_MONITOR";
-long start;
-long stop;
+long startManipulation;
+long stopManipulation;
 bool manipulationFlag = 0;
 
 //triggerPinIn = 0;
@@ -28,29 +28,39 @@ void timeWatchDog()
 { 
     uint8_t prevIn1 = 0;
     uint8_t prevOut1 = 0;
-    start = 0;
+    startManipulation = 0;
     for( ;; )
     {
         if(triggerPinInFlag == prevIn1 + 1)
         {
-            stop = xTaskGetTickCount();
-            if((stop - start) < 2 ){
-                printf("maipulated time detected: %ld\n", (stop - start));
+            //measures time between two interrupt signals. If too small, manipulation is detected
+            stopManipulation = xTaskGetTickCount();
+            if((stopManipulation - startManipulation) < 2 ){
+                printf("maipulated time detected: %ld\n", (stopManipulation - startManipulation));
                 manipulationFlag = 1;
             }
-            start = xTaskGetTickCount();
+             if((stopManipulation - startManipulation) > 100 ){
+                printf("Reset container arrays! Time %ld\n", (stopManipulation - startManipulation));
+                reset_maipulated_arrays();
+            }
+            startManipulation = xTaskGetTickCount();
         } else if(triggerPinOutFlag == prevOut1 + 1){
-            stop = xTaskGetTickCount();
-            if((stop - start) < 2 ){
-                printf("maipulated time detected: %ld\n", (stop - start));
+            //measures time between two interrupt signals. If too small, manipulation is detected
+            stopManipulation = xTaskGetTickCount();
+            if((stopManipulation - startManipulation) < 2 ){
+                printf("maipulated time detected: %ld\n", (stopManipulation - startManipulation));
                 manipulationFlag = 1;
             }
-            start = xTaskGetTickCount();
+            if((stopManipulation - startManipulation) > 100 ){
+                printf("Reset container arrays! Time: %ld\n", (stopManipulation - startManipulation));
+                reset_maipulated_arrays();
+            }
+            startManipulation = xTaskGetTickCount();
         }
         prevIn1 = triggerPinInFlag;
         prevOut1 = triggerPinOutFlag;
         vTaskDelay(10 / portTICK_PERIOD_MS);
-        //printf("time stoped: %ld\n", (stop - start));
+        // detect turnarounds or indecission entry and exits. Defined as: If further interrupts are detected within 5 ms after an increment of a count.
     }
 }
 
@@ -105,6 +115,7 @@ void executeCountingAlgoTests()
     //Corner cases
     halfwayEnter();
     breaksOuterAndInnerButReturnsG4();
+    vTaskDelay(5000 / portTICK_RATE_MS);
     personTurnedG9();
     unsureEnter();
     manipulationEnter();
@@ -132,7 +143,7 @@ void configureRoomMonitoring()
     //hook triggerPinOutFunction for triggerPinOut gpio pin
     gpio_isr_handler_add(triggerPinOut, triggerPinOutHandler, (void*) triggerPinOut);
 
-    // creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
+    //creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
     xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
 	
     //monitors the time between interrupt signals to spot manipulation
