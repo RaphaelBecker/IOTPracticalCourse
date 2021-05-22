@@ -15,20 +15,31 @@ static void restartDevice()
 {
 	struct tm timeinfo = {0};
 	time_t now = 0;
-	while(1)
+	while (1)
 	{
 		//call once every hour
 		vTaskDelay(3600000 / portTICK_PERIOD_MS);
-		
+
 		//check if its 3am
 		time(&now);
-        localtime_r(&now, &timeinfo);
+		localtime_r(&now, &timeinfo);
 		if (timeinfo.tm_hour == 3)
 		{
+			//Set task to 0 if not 0
+			if (task != 0)
+			{
+				count = 0;
+				mqttPublishCount();
+				vTaskDelay(5000 / portTICK_PERIOD_MS);
+			}
 			//Restart esp32
 			esp_restart();
 		}
 	}
+}
+
+static void retrieveLatestCount()
+{
 	
 }
 
@@ -69,12 +80,12 @@ void app_main(void)
 	//Connect to the Wifi Network
 	connectWifi();
 
-	//Initialize SNTP 
+	//Initialize SNTP
 	initializeSntp();
 
 	//Call SNTP to sync time with server
 	obtainTime();
-	
+
 	//starts mqtt handler
 	mqtt_app_start();
 
@@ -82,19 +93,19 @@ void app_main(void)
 	configureRoomMonitoring();
 
 	//Start Tasks:
-	
+
 	//update oled display and show Room status
 	xTaskCreate(showRoomState, "DisplayRoomState", 2048, NULL, 10, NULL);
-	
+
 	//updates timestamp from SNTP (Simple Network Time Protocol)
 	xTaskCreate(vUpdateTimeStamp, "TimeStamp", 1024, NULL, 5, NULL);
-	
-	//publishes a restart event 
+
+	//publishes a restart event
 	xTaskCreate(mqttPublishRestart, "PublishRestart", 2048, NULL, 5, NULL);
-	
+
 	//publishes the room count
 	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 2048, NULL, 10, NULL);
 
 	//restarts the device at 3am every day
-	xTaskCreate(restartDevice, "RestartAtNight",1024,NULL,20,NULL);
+	xTaskCreate(restartDevice, "RestartAtNight", 1024, NULL, 20, NULL);
 }
