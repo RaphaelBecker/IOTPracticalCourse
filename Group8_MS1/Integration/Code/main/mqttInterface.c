@@ -232,6 +232,7 @@ void mqttPublishCount()
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    #ifndef TESTING
     esp_mqtt_client_start(clientIOT);
     ESP_LOGI(TAG2, "Sending count event");
     long long int now_Long = (long long) now;
@@ -244,6 +245,7 @@ void mqttPublishCount()
     printf(buffer);
     printf("\n");
     esp_mqtt_client_stop(clientIOT);
+    #endif
 }
 
 void mqttPublishCountTask()
@@ -281,6 +283,7 @@ void mqttPublishRestart()
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    #ifndef TESTING
     esp_mqtt_client_start(clientIOT);
     ESP_LOGI(TAG2, "Sending restart event");
     long long int now_Long = (long long) now;
@@ -293,6 +296,7 @@ void mqttPublishRestart()
     printf(buffer);
     printf("\n");
     esp_mqtt_client_stop(clientIOT);
+    #endif
     //ESP_LOGI(TAG2, payload);
     vTaskDelete(NULL);
 }

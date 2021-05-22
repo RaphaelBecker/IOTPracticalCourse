@@ -11,6 +11,27 @@
 
 static const char *TAG = "ROOM";
 
+static void restartDevice()
+{
+	struct tm timeinfo = {0};
+	time_t now = 0;
+	while(1)
+	{
+		//call once every hour
+		vTaskDelay(3600000 / portTICK_PERIOD_MS);
+		
+		//check if its 3am
+		time(&now);
+        localtime_r(&now, &timeinfo);
+		if (timeinfo.tm_hour == 3)
+		{
+			//Restart esp32
+			esp_restart();
+		}
+	}
+	
+}
+
 void app_main(void)
 {
 	count = 0;
@@ -74,4 +95,6 @@ void app_main(void)
 	//publishes the room count
 	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 2048, NULL, 10, NULL);
 
+	//restarts the device at 3am every day
+	xTaskCreate(restartDevice, "RestartAtNight",1024,NULL,20,NULL);
 }

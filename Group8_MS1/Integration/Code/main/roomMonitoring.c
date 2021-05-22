@@ -150,7 +150,7 @@ void configureRoomMonitoring()
     xTaskCreate(timeWatchDog, "timeWatchDog", 2048, NULL, 20, NULL);
 
     //executes Tests to evaluate the room counter algorithm in counter.c
-    executeCountingAlgoTests();
+    //executeCountingAlgoTests();
     
     //ued for debugging:
     ESP_LOGI(TAG, "prev_triggerPinInFlag: %d", prev_triggerPinInFlag);
