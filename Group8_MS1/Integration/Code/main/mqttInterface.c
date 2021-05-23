@@ -272,10 +272,10 @@ void mqttPublishCountTask()
         
         time(&now);
         localtime_r(&now, &timeinfo);
-        mqttPublishCount();
+        //mqttPublishCount();
         if (timeinfo.tm_min == 0 || timeinfo.tm_min == 15 || timeinfo.tm_min == 30 || timeinfo.tm_min == 45)
         {
-            //mqttPublishCount();
+            mqttPublishCount();
         }
         vTaskDelay(60000 / portTICK_PERIOD_MS);
         //check if we are still connected
@@ -302,7 +302,7 @@ void mqttPublishRestart()
         connection = esp_mqtt_client_start(clientIOT);
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
-    
+
     ESP_LOGI(TAG2, "Sending restart event");
     long long int now_Long = (long long) now;
     now_Long *= 1000LL;
