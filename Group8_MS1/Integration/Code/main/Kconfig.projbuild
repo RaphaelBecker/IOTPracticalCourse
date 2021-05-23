@@ -88,5 +88,20 @@ menu "MQTT-LoginDetails"
         help
             used for the mqtt channel
 
+    config SENSOR_ID
+        string "iot platform count sensor id"
+        default ""
+        help
+            used to initialize the counter on restarts
+
+
+endmenu
+
+menu ELASTICSEARCH
+    config WEB_CONSUMER_TOKEN
+        string "iot consumer token"
+        default ""
+        help
+            iot consumer token with access to the count sensor id
 
 endmenu

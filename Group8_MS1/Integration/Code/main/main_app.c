@@ -8,6 +8,7 @@
 #include "mqttInterface.h"
 #include "roomMonitoring.h"
 #include "commands.h"
+#include "http_client.h"
 
 static const char *TAG = "ROOM";
 
@@ -25,8 +26,8 @@ static void restartDevice()
 		localtime_r(&now, &timeinfo);
 		if (timeinfo.tm_hour == 3)
 		{
-			//Set task to 0 if not 0
-			if (task != 0)
+			//Set count to 0 if not 0
+			if (count != 0)
 			{
 				count = 0;
 				mqttPublishCount();
@@ -38,10 +39,6 @@ static void restartDevice()
 	}
 }
 
-static void retrieveLatestCount()
-{
-	
-}
 
 void app_main(void)
 {
@@ -86,6 +83,9 @@ void app_main(void)
 	//Call SNTP to sync time with server
 	obtainTime();
 
+	//Check iot platform api for latest submitted count to initialize our counter
+	checkAPIforLatestCount();
+
 	//starts mqtt handler
 	mqtt_app_start();
 
@@ -104,7 +104,7 @@ void app_main(void)
 	xTaskCreate(mqttPublishRestart, "PublishRestart", 2048, NULL, 5, NULL);
 
 	//publishes the room count
-	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 2048, NULL, 10, NULL);
+	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 4096, NULL, 10, NULL);
 
 	//restarts the device at 3am every day
 	xTaskCreate(restartDevice, "RestartAtNight", 1024, NULL, 20, NULL);
