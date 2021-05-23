@@ -233,7 +233,7 @@ void mqttPublishCount()
     char *sensor_name = "count";
     if (strcmp(MQTT_TOPIC, "ROOM_EVENTS")!=0)
     {
-        sensor_name = "eval_group1";
+        sensor_name = "eval_group8";
     }
     
 

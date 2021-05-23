@@ -22,9 +22,8 @@
 #define WEB_SERVER "iotplatform.caps.in.tum.de"
 #define WEB_PORT "443"
 #define SENSOR_ID CONFIG_SENSOR_ID
-#define WEB_URL "https://iotplatform.caps.in.tum.de:443/api/consumers/consume/"SENSOR_ID"/_search"
+#define WEB_URL "https://iotplatform.caps.in.tum.de:443/api/consumers/consume/" SENSOR_ID "/_search"
 #define WEB_CONSUMER_TOKEN CONFIG_WEB_CONSUMER_TOKEN
-
 
 static const char *TAG = "HTTP_CLIENT";
 
@@ -196,7 +195,7 @@ static void http_rest_with_url()
      */
         esp_http_client_config_t config = {
             .host = WEB_SERVER,
-            .path = "/api/consumers/consume/"SENSOR_ID"/_search",
+            .path = "/api/consumers/consume/" SENSOR_ID "/_search",
             //.query = "esp",
             .event_handler = _http_event_handler,
             .user_data = local_response_buffer, // Pass address of local buffer to get response
@@ -207,7 +206,7 @@ static void http_rest_with_url()
 
         // POST
         const char *post_data = "{\"_source\": [\"value\",\"timestamp\"],\"sort\":[{\"timestamp\": {\"order\": \"desc\"}}],\"size\":1}";
-        esp_http_client_set_url(client, "https://iotplatform.caps.in.tum.de:443/api/consumers/consume/"SENSOR_ID"/_search");
+        esp_http_client_set_url(client, "https://iotplatform.caps.in.tum.de:443/api/consumers/consume/" SENSOR_ID "/_search");
         esp_http_client_set_method(client, HTTP_METHOD_POST);
         esp_http_client_set_header(client, "Content-Type", "application/json");
         esp_http_client_set_header(client, "Authorization", "Bearer " WEB_CONSUMER_TOKEN);
@@ -261,5 +260,9 @@ static void http_rest_with_url()
 
 void checkAPIforLatestCount(void)
 {
-    xTaskCreate(http_rest_with_url, "http_rest_with_url", 16384, NULL, 5, NULL);
+    //Only check if we are in normal operation, not for evaluation purposes
+    if (strcmp(CONFIG_MQTT_TOPIC, "ROOM_EVENTS") == 0)
+    {
+        xTaskCreate(http_rest_with_url, "http_rest_with_url", 16384, NULL, 5, NULL);
+    }
 }
