@@ -205,7 +205,7 @@ void mqtt_app_start(void)
         .username = CONFIG_IOT_MQTT_USERNAME,
         .password = CONFIG_IOT_MQTT_DEVICEKEY,
         .client_id = "platform-client",
-        .refresh_connection_after_ms = 10000,
+        .refresh_connection_after_ms = 120000,
         .disable_auto_reconnect = 0,
         .keepalive = 10,
     };

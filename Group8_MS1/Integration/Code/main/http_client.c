@@ -68,7 +68,7 @@ void JSON_GetLatestCount(const cJSON *const root)
         if (current_element->string)
         {
             const char *name = current_element->string;
-            ESP_LOGI(TAG, "[%s]", name);
+            //ESP_LOGI(TAG, "[%s]", name);
             if (strcmp(name, "timestamp") == 0)
             {
                 if (cJSON_IsNumber(current_element))
