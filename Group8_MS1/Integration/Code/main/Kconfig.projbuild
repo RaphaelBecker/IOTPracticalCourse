@@ -25,6 +25,12 @@ menu "Room Controller Configuration"
         help
             URL of an mqtt broker which this example connects to.
 
+    config MQTT_TOPIC
+        string "MQTT Topic Name"
+        default "ROOM_EVENTS"
+        help
+            Topic to listen to for room events
+
         
     config BROKER_CERTIFICATE_OVERRIDE
         string "Broker certificate override"

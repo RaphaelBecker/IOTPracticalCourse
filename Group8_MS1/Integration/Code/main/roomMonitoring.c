@@ -1,6 +1,7 @@
 #include "roomMonitoring.h"
 #include "commands.h"
 #include "main_app.h"
+#include "mqttInterface.h"
 #include "counter.h"
 #include <sys/time.h>
 
@@ -23,6 +24,21 @@ bool manipulationFlag = 0;
 
 //triggerPinIn = 0;
 //triggerPinOut = 2;
+
+
+
+void publishCountOnChange()
+{
+    while (1)
+    {
+        if (count != lastPublishedCount)
+        {
+            lastPublishedCount = count;
+            mqttPublishCount();
+        }
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+    }
+}
 
 void timeWatchDog()
 { 

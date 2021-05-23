@@ -44,6 +44,7 @@ void app_main(void)
 {
 	count = 0;
 	internalCount = 0;
+	lastPublishedCount = 0;
 	ESP_LOGI(TAG, "Boot sequence finished, starting app_main");
 
 	ESP_LOGI(TAG, "[APP] Startup..");
@@ -105,6 +106,9 @@ void app_main(void)
 
 	//publishes the room count
 	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 4096, NULL, 10, NULL);
+
+	//publishes the room count on change
+	xTaskCreate(publishCountOnChange, "PublishCountChange", 4096, NULL, 10, NULL);
 
 	//restarts the device at 3am every day
 	xTaskCreate(restartDevice, "RestartAtNight", 1024, NULL, 20, NULL);

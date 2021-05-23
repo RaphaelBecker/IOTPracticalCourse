@@ -12,6 +12,7 @@
 #include "esp_log.h"
 
 // Room count:
+uint8_t lastPublishedCount;
 volatile uint8_t count;
 uint8_t prev_count;
 volatile uint8_t internalCount;

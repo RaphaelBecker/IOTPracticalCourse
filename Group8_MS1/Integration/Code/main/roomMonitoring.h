@@ -9,5 +9,6 @@ void timeWatchDog();
 void monitorTriggerPinFlags();
 void configureRoomMonitoring();
 void taskRoomMonitoring();
+void publishCountOnChange();
 
 #endif /* ROOMMONITORING_H */

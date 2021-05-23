@@ -5,6 +5,8 @@
 #include <time.h>
 #include <sys/time.h>
 
+#define MQTT_TOPIC CONFIG_MQTT_TOPIC
+
 static const char *TAG = "MQTT";
 static const char *TAG2 = "MQTT-Platform";
 
@@ -22,12 +24,17 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         //msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
         //ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-        msg_id = esp_mqtt_client_subscribe(client, "ROOM_EVENTS", 2);
+        msg_id = esp_mqtt_client_subscribe(client, MQTT_TOPIC, 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
 
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+        //Reconnect
+        esp_mqtt_client_stop(clientROOM);
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+        esp_mqtt_client_start(clientROOM);
+
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
@@ -47,6 +54,8 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         const char *room_events = "ROOM_EVENTS";
 
         int len = strlen(room_events);
+
+        //Listening to room_events -> not evaluation
         if ((len == event->topic_len) && (!strncmp(event->topic, room_events, len)))
         {
             if (event->data_len == 4 && (strncmp(event->data, "ping", 4) == 0))
@@ -67,6 +76,22 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
                     count--;
                 }
                 mqttPublishCount();
+            }
+        }
+        //Evaluation
+        else
+        {
+            if (event->data_len == 4 && (strncmp(event->data, "ping", 4) == 0))
+            {
+                ping();
+            }
+            else if (event->data_len == 5 && strncmp(event->data, "enter", 5) == 0)
+            {
+                enterRoom();
+            }
+            else if (event->data_len == 5 && strncmp(event->data, "leave", 5) == 0)
+            {
+                leaveRoom();
             }
             else if (event->data_len == 11 && strncmp(event->data, "unsureEnter", 11) == 0)
             {
@@ -171,38 +196,6 @@ void mqtt_app_start(void)
 
     ESP_LOGI(TAG, CONFIG_BROKER_URL);
 
-#if CONFIG_BROKER_URL_FROM_STDIN
-    char line[128];
-
-    if (strcmp(mqtt_cfg.uri, "FROM_STDIN") == 0)
-    {
-        int count = 0;
-        printf("Please enter url of mqtt broker\n");
-        while (count < 128)
-        {
-            int c = fgetc(stdin);
-            if (c == '\n')
-            {
-                line[count] = '\0';
-                break;
-            }
-            else if (c > 0 && c < 127)
-            {
-                line[count] = c;
-                ++count;
-            }
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-        }
-        mqtt_cfg.uri = line;
-        printf("Broker url: %s\n", line);
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Configuration mismatch: wrong broker url");
-        abort();
-    }
-#endif /* CONFIG_BROKER_URL_FROM_STDIN */
-
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
     esp_mqtt_client_start(client);
@@ -237,9 +230,16 @@ void mqttPublishCount()
     ESP_LOGI(TAG2, "Sending count event");
     long long int now_Long = (long long) now;
     now_Long *= 1000LL;
+    char *sensor_name = "count";
+    if (strcmp(MQTT_TOPIC, "ROOM_EVENTS")!=0)
+    {
+        sensor_name = "eval_group1";
+    }
+    
+
 
     char buffer[256];
-    int length = sprintf(buffer, "{\"username\":\"%s\",\"count\":%d,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, count, CONFIG_IOT_DEVICEID, now_Long);
+    int length = sprintf(buffer, "{\"username\":\"%s\",\"%s\":%d,\"device_id\":%d,\"timestamp\":%lld}", CONFIG_IOT_USERNAME, sensor_name, count, CONFIG_IOT_DEVICEID, now_Long);
     int msg_id = esp_mqtt_client_publish(clientIOT, CONFIG_IOT_USER_DEVICEID, buffer, length, 2, 0);
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
