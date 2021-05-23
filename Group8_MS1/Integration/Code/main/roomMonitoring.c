@@ -36,7 +36,7 @@ void publishCountOnChange()
             lastPublishedCount = count;
             mqttPublishCount();
         }
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+        vTaskDelay(500/portTICK_PERIOD_MS);
     }
 }
 
