@@ -24,7 +24,10 @@ uint8_t sensor_container[4] = {0};
 
 void test12()
 {
-	count++;
+	if (count < 99)
+	{
+		count++;
+	}
 }
 
 // shifts the elements of an passed array 1 int to the left
@@ -102,7 +105,10 @@ void detect_crossing_barrier_by_pattern()
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
 		// add person to room:
-		count++;
+		if (count < 99)
+		{
+			count++;
+		}
 		printf("count: %d\n", count);
 	}
 	else if (compare_arrays(sensor_container, sensor_enter_pattern_1, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_enter_level_pattern_1, sizeof(&sensor_container)))
@@ -116,8 +122,14 @@ void detect_crossing_barrier_by_pattern()
 		//print_array(sensor_enter_level_pattern_1, 4);
 		// after detection, reset arrays:
 		reset_arrays(sensor_container, sensor_level_container, 4);
+
 		// add person to room:
-		count++;
+		//Guard against stupid numbers
+		if (count < 99)
+		{
+			count++;
+		}
+
 		printf("count: %d\n", count);
 	}
 	else if (compare_arrays(sensor_container, sensor_exit_pattern_0, sizeof(&sensor_container)) && compare_arrays(sensor_level_container, sensor_exit_level_pattern_0, sizeof(&sensor_container)))
@@ -154,7 +166,6 @@ void detect_crossing_barrier_by_pattern()
 		{
 			count--;
 		}
-
 		printf("count: %d\n", count);
 	}
 }

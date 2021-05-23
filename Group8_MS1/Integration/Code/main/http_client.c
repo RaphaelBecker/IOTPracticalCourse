@@ -252,7 +252,7 @@ static void http_rest_with_url()
         }
 
         esp_http_client_cleanup(client);
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 
     vTaskDelete(NULL);
@@ -260,9 +260,5 @@ static void http_rest_with_url()
 
 void checkAPIforLatestCount(void)
 {
-    //Only check if we are in normal operation, not for evaluation purposes
-    if (strcmp(CONFIG_MQTT_TOPIC, "ROOM_EVENTS") == 0)
-    {
-        xTaskCreate(http_rest_with_url, "http_rest_with_url", 16384, NULL, 5, NULL);
-    }
+    xTaskCreate(http_rest_with_url, "http_rest_with_url", 16384, NULL, 5, NULL);
 }
