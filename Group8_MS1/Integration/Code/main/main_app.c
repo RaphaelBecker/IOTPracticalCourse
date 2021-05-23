@@ -102,7 +102,7 @@ void app_main(void)
 	xTaskCreate(vUpdateTimeStamp, "TimeStamp", 1024, NULL, 5, NULL);
 
 	//publishes a restart event
-	xTaskCreate(mqttPublishRestart, "PublishRestart", 2048, NULL, 5, NULL);
+	xTaskCreate(mqttPublishRestart, "PublishRestart", 4096, NULL, 5, NULL);
 
 	//publishes the room count
 	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 4096, NULL, 10, NULL);
@@ -116,5 +116,5 @@ void app_main(void)
 	
 
 	//restarts the device at 3am every day
-	xTaskCreate(restartDevice, "RestartAtNight", 1024, NULL, 20, NULL);
+	xTaskCreate(restartDevice, "RestartAtNight", 2048, NULL, 20, NULL);
 }

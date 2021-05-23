@@ -13,6 +13,9 @@ static const char *TAG2 = "MQTT-Platform";
 static esp_mqtt_client_handle_t clientIOT;
 static esp_mqtt_client_handle_t clientROOM;
 
+static bool roomConnected = false;
+
+
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
     esp_mqtt_client_handle_t client = event->client;
@@ -27,14 +30,12 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         msg_id = esp_mqtt_client_subscribe(client, MQTT_TOPIC, 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
 
+        roomConnected = 1;
+
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-        //Reconnect
-        esp_mqtt_client_stop(clientROOM);
-        vTaskDelay(1000/portTICK_PERIOD_MS);
-        esp_mqtt_client_start(clientROOM);
-
+        roomConnected = 0;
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
@@ -264,6 +265,7 @@ void mqttPublishCountTask()
     //Run task every minute that sends count to iot platform at 00, 15, 30 and 45
     while (1)
     {
+        
         time(&now);
         localtime_r(&now, &timeinfo);
         if (timeinfo.tm_min == 0 || timeinfo.tm_min == 15 || timeinfo.tm_min == 30 || timeinfo.tm_min == 45)
@@ -271,6 +273,11 @@ void mqttPublishCountTask()
             mqttPublishCount();
         }
         vTaskDelay(60000 / portTICK_PERIOD_MS);
+        //check if we are still connected
+        if (!roomConnected)
+        {
+            esp_mqtt_client_reconnect(clientROOM);
+        }
     }
 }
 
