@@ -13,8 +13,6 @@ static const char *TAG2 = "MQTT-Platform";
 static esp_mqtt_client_handle_t clientIOT;
 static esp_mqtt_client_handle_t clientROOM;
 
-static bool roomConnected = false;
-
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
@@ -30,12 +28,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         msg_id = esp_mqtt_client_subscribe(client, MQTT_TOPIC, 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
 
-        roomConnected = 1;
 
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-        roomConnected = 0;
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
@@ -209,11 +205,14 @@ void mqtt_app_start(void)
         .username = CONFIG_IOT_MQTT_USERNAME,
         .password = CONFIG_IOT_MQTT_DEVICEKEY,
         .client_id = "platform-client",
+        .refresh_connection_after_ms = 10000,
+        .disable_auto_reconnect = 0,
+        .keepalive = 10,
     };
 
     client = esp_mqtt_client_init(&mqtt_cfg2);
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler2, client);
-    //esp_mqtt_client_start(client);
+    esp_mqtt_client_start(client);
     clientIOT = client;
 }
 
@@ -225,13 +224,6 @@ void mqttPublishCount()
     {
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    esp_err_t connection = ESP_FAIL;
-    while(connection != ESP_OK)
-    {
-        ESP_LOGI(TAG2, "Connecting to MQTT");
-        connection = esp_mqtt_client_start(clientIOT);
-        vTaskDelay(100/portTICK_PERIOD_MS);
     }
     ESP_LOGI(TAG2, "Sending count event");
     long long int now_Long = (long long) now;
@@ -250,7 +242,6 @@ void mqttPublishCount()
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
     printf("\n");
-    esp_mqtt_client_stop(clientIOT);
 }
 
 void mqttPublishCountTask()
@@ -272,17 +263,11 @@ void mqttPublishCountTask()
         
         time(&now);
         localtime_r(&now, &timeinfo);
-        //mqttPublishCount();
         if (timeinfo.tm_min == 0 || timeinfo.tm_min == 15 || timeinfo.tm_min == 30 || timeinfo.tm_min == 45)
         {
             mqttPublishCount();
         }
         vTaskDelay(60000 / portTICK_PERIOD_MS);
-        //check if we are still connected
-        if (!roomConnected)
-        {
-            esp_mqtt_client_reconnect(clientROOM);
-        }
     }
 }
 
@@ -295,13 +280,6 @@ void mqttPublishRestart()
         time(&now);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    esp_err_t connection = ESP_FAIL;
-    while(connection != ESP_OK)
-    {
-        ESP_LOGI(TAG2, "Connecting to MQTT");
-        connection = esp_mqtt_client_start(clientIOT);
-        vTaskDelay(100/portTICK_PERIOD_MS);
-    }
 
     ESP_LOGI(TAG2, "Sending restart event");
     long long int now_Long = (long long) now;
@@ -313,7 +291,6 @@ void mqttPublishRestart()
     ESP_LOGI(TAG2, "sent publish successful, msg_id=%d", msg_id);
     printf(buffer);
     printf("\n");
-    esp_mqtt_client_stop(clientIOT);
     //ESP_LOGI(TAG2, payload);
     vTaskDelete(NULL);
 }
