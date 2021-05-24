@@ -25,8 +25,6 @@ bool manipulationFlag = 0;
 //triggerPinIn = 0;
 //triggerPinOut = 2;
 
-
-
 void publishCountOnChange()
 {
     while (1)
@@ -36,141 +34,64 @@ void publishCountOnChange()
             lastPublishedCount = count;
             mqttPublishCount();
         }
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
-void timeWatchDog()
-{ 
-    uint8_t prevIn1 = 0;
-    uint8_t prevOut1 = 0;
-    startManipulation = 0;
-    for( ;; )
+void monitorTriggerPinFlags()
+{
+    for (;;)
     {
-        if(triggerPinInFlag == prevIn1 + 1)
-        {
-            //measures time between two interrupt signals. If too small, manipulation is detected
-            stopManipulation = xTaskGetTickCount();
-            if((stopManipulation - startManipulation) < 2 ){
-                printf("maipulated time detected: %ld\n", (stopManipulation - startManipulation));
-                manipulationFlag = 1;
-            }
-             if((stopManipulation - startManipulation) > 100 ){
-                printf("Reset container arrays! Time %ld\n", (stopManipulation - startManipulation));
-                reset_maipulated_arrays();
-            }
-            startManipulation = xTaskGetTickCount();
-        } else if(triggerPinOutFlag == prevOut1 + 1){
-            //measures time between two interrupt signals. If too small, manipulation is detected
-            stopManipulation = xTaskGetTickCount();
-            if((stopManipulation - startManipulation) < 2 ){
-                printf("maipulated time detected: %ld\n", (stopManipulation - startManipulation));
-                manipulationFlag = 1;
-            }
-            if((stopManipulation - startManipulation) > 100 ){
-                printf("Reset container arrays! Time: %ld\n", (stopManipulation - startManipulation));
-                reset_maipulated_arrays();
-            }
-            startManipulation = xTaskGetTickCount();
-        }
-        prevIn1 = triggerPinInFlag;
-        prevOut1 = triggerPinOutFlag;
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-        // detect turnarounds or indecission entry and exits. Defined as: If further interrupts are detected within 5 ms after an increment of a count.
-    }
-}
-
-void monitorTriggerPinFlags(){
-    prev_triggerPinInFlag = triggerPinInFlag;
-    prev_triggerPinOutFlag = triggerPinOutFlag;
-    for(;;)
-    {
+        //Run task every 10 ms
         vTaskDelay(10 / portTICK_RATE_MS);
-        if(triggerPinInFlag == prev_triggerPinInFlag + 1)
+
+        //Save interrupts to array
+        if (triggerPinInFlag > 0)
         {
-            prev_triggerPinInFlag = triggerPinInFlag;
-            //debugging:
-            printf("GPIO[%d] interupt, val: %d \n", triggerPinIn, gpio_get_level(triggerPinIn));
-            if(manipulationFlag == 1){
-                insertManipulationFlagToArrayBuffer();
-                manipulationFlag = 0;
-            } else {
-            insertSignalPinInToArrayBuffer();
-            }
+            xTaskCreate(insertSignalPinToArrayBuffer,"insertPin", 2048,(void *) triggerPinIn, 3, NULL);
+            triggerPinInFlag = 0;
         }
-        if(triggerPinOutFlag == prev_triggerPinOutFlag + 1)
+        if (triggerPinOutFlag > 0)
         {
-            prev_triggerPinOutFlag = triggerPinOutFlag;
-            //debugging:
-            printf("GPIO[%d] interupt, val: %d \n", triggerPinOut, gpio_get_level(triggerPinOut));
-             if(manipulationFlag == 1){
-                insertManipulationFlagToArrayBuffer();
-                manipulationFlag = 0;
-            } else {
-            insertSignalPinOutToArrayBuffer();
-            }
+            xTaskCreate(insertSignalPinToArrayBuffer,"insertPin", 2048,(void *) triggerPinOut, 3, NULL);
+            triggerPinOutFlag = 0;
         }
     }
 }
 
-static void IRAM_ATTR triggerPinInHandler(void* arg)
+//Interrupt Handlers
+static void IRAM_ATTR triggerPinInHandler(void *arg)
 {
     triggerPinInFlag++;
 }
 
-static void IRAM_ATTR triggerPinOutHandler(void* arg)
+static void IRAM_ATTR triggerPinOutHandler(void *arg)
 {
     triggerPinOutFlag++;
 }
 
-void executeCountingAlgoTests()
-{
-    enterRoom();
-    leaveRoom();
-
-    //Corner cases
-    halfwayEnter();
-    breaksOuterAndInnerButReturnsG4();
-    vTaskDelay(5000 / portTICK_RATE_MS);
-    personTurnedG9();
-    unsureEnter();
-    manipulationEnter();
-    peeketoandLeaveG11();
-    successiveEnter();
-}
-
+//Setup
 void configureRoomMonitoring()
 {
+    //initialize variables for interrupts
+    triggerPinInFlag = 0;
+    triggerPinOutFlag = 0;
+
     //install gpio isr service
     gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
 
+    //Configure GPIO pins
     gpio_set_direction(CONFIG_LED_GPIO, GPIO_MODE_OUTPUT);
-
     gpio_set_direction(triggerPinIn, GPIO_MODE_INPUT_OUTPUT);
-
     gpio_set_direction(triggerPinOut, GPIO_MODE_INPUT_OUTPUT);
-    
-    gpio_set_intr_type(triggerPinIn, GPIO_INTR_ANYEDGE);
 
+    gpio_set_intr_type(triggerPinIn, GPIO_INTR_ANYEDGE);
     gpio_set_intr_type(triggerPinOut, GPIO_INTR_ANYEDGE);
 
-    //hook triggerPinInFunction for triggerPinIn gpio pin
-    gpio_isr_handler_add(triggerPinIn, triggerPinInHandler,  (void*) triggerPinIn);
-    //hook triggerPinOutFunction for triggerPinOut gpio pin
-    gpio_isr_handler_add(triggerPinOut, triggerPinOutHandler, (void*) triggerPinOut);
+    //Set interrupt handlers for triggerPinIn and triggerPinOut
+    gpio_isr_handler_add(triggerPinIn, triggerPinInHandler, (void *)triggerPinIn);
+    gpio_isr_handler_add(triggerPinOut, triggerPinOutHandler, (void *)triggerPinOut);
 
     //creates task to monitor the triggerPinInFlag and triggerPinOutFlag, which triggers the counter algorithm by increment
     xTaskCreate(monitorTriggerPinFlags, "monitorTriggerPinFlags", 4096, NULL, 15, NULL);
-	
-    //monitors the time between interrupt signals to spot manipulation
-    xTaskCreate(timeWatchDog, "timeWatchDog", 2048, NULL, 20, NULL);
-
-    //executes Tests to evaluate the room counter algorithm in counter.c
-    //executeCountingAlgoTests();
-    
-    //ued for debugging:
-    ESP_LOGI(TAG, "prev_triggerPinInFlag: %d", prev_triggerPinInFlag);
-    ESP_LOGI(TAG, "prev_triggerPinOutFlag: %d", prev_triggerPinOutFlag);
-    ESP_LOGI(TAG, "count: %d", count);
-
 }
