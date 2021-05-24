@@ -6,6 +6,7 @@
 
 // #### pattern definition ####:
 // enter_pattern_0:
+
 uint8_t sensor_enter_pattern_0[4] = {2, 0, 2, 0};
 uint8_t sensor_enter_level_pattern_0[4] = {1, 1, 0, 0};
 // enter_pattern_1:
@@ -22,13 +23,6 @@ uint8_t sensor_exit_level_pattern_1[4] = {1, 0, 1, 0};
 uint8_t sensor_level_container[4] = {0};
 uint8_t sensor_container[4] = {0};
 
-void test12()
-{
-	if (count < 99)
-	{
-		count++;
-	}
-}
 
 // shifts the elements of an passed array 1 int to the left
 void shift_to_left(uint8_t *array, uint8_t size, uint8_t last_elem)
