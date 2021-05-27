@@ -105,13 +105,16 @@ void app_main(void)
 	xTaskCreate(mqttPublishRestart, "PublishRestart", 4096, NULL, 5, NULL);
 
 	//publishes the room count
-	xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 4096, NULL, 10, NULL);
-
 	//for evaluation use different publishing method
-	if (strcmp(CONFIG_MQTT_TOPIC, "ROOM_EVENTS")!= 0)
+	if (strcmp(CONFIG_MQTT_TOPIC, "ROOM_EVENTS")== 0)
+	{
+		xTaskCreate(mqttPublishCountTask, "PublishCountPeriod", 4096, NULL, 10, NULL);
+	}
+	else
 	{
 		//publishes the room count on change
 		xTaskCreate(publishCountOnChange, "PublishCountChange", 4096, NULL, 10, NULL);
+		xTaskCreate(publishCountEverySecond, "PublishCountSeconds", 4096, NULL, 10, NULL);
 	}
 	
 

@@ -10,5 +10,6 @@ void monitorTriggerPinFlags();
 void configureRoomMonitoring();
 void taskRoomMonitoring();
 void publishCountOnChange();
+void publishCountEverySecond();
 
 #endif /* ROOMMONITORING_H */

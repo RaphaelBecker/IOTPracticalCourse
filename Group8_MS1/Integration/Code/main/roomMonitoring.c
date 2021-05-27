@@ -38,6 +38,15 @@ void publishCountOnChange()
     }
 }
 
+void publishCountEverySecond()
+{
+    while (1)
+    {
+        mqttPublishCount();
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 void monitorTriggerPinFlags()
 {
     for (;;)
@@ -48,12 +57,12 @@ void monitorTriggerPinFlags()
         //Save interrupts to array
         if (triggerPinInFlag > 0)
         {
-            xTaskCreate(insertSignalPinToArrayBuffer,"insertPin", 2048,(void *) triggerPinIn, 3, NULL);
+            xTaskCreate(insertSignalPinToArrayBuffer, "insertPin", 2048, (void *)triggerPinIn, 3, NULL);
             triggerPinInFlag = 0;
         }
         if (triggerPinOutFlag > 0)
         {
-            xTaskCreate(insertSignalPinToArrayBuffer,"insertPin", 2048,(void *) triggerPinOut, 3, NULL);
+            xTaskCreate(insertSignalPinToArrayBuffer, "insertPin", 2048, (void *)triggerPinOut, 3, NULL);
             triggerPinOutFlag = 0;
         }
     }
