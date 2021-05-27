@@ -204,6 +204,8 @@ static void http_rest_with_url()
         };
         esp_http_client_handle_t client = esp_http_client_init(&config);
 
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+
         // POST
         const char *post_data = "{\"_source\": [\"value\",\"timestamp\"],\"sort\":[{\"timestamp\": {\"order\": \"desc\"}}],\"size\":1}";
         esp_http_client_set_url(client, "https://iotplatform.caps.in.tum.de:443/api/consumers/consume/" SENSOR_ID "/_search");

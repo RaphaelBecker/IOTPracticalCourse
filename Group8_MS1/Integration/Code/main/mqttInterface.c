@@ -110,7 +110,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             {
                 manipulationEnter();
             }
-            else if (event->data_len == 18 && strncmp(event->data, "peeketoandLeaveG11", 18) == 0)
+            else if (event->data_len == 19 && strncmp(event->data, "peekIntoandLeaveG11", 19) == 0)
             {
                 peeketoandLeaveG11();
             }
