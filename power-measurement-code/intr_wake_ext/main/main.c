@@ -85,8 +85,8 @@ static void enterRegistered(int64_t timestamp)
 	//Wait 500ms
 	vTaskDelay(500 / portTICK_PERIOD_MS);
 	//Check if the outer sensor has been broken and unbroken in the meantime
-	if (sensor_container[2] == triggerPinOut &&
-		sensor_container[3] == triggerPinOut &&
+	if (sensor_container[2] == OUTERGPIOPIN &&
+		sensor_container[3] == OUTERGPIOPIN &&
 		sensor_level_container[2] == 1 &&
 		sensor_level_container[3] == 0)
 	{
@@ -111,8 +111,8 @@ static void exitRegistered(int64_t timestamp)
 	//Wait 500ms
 	vTaskDelay(500 / portTICK_PERIOD_MS);
 	//Check if the inner sensor has been broken and unbroken in the meantime
-	if (sensor_container[2] == triggerPinIn &&
-		sensor_container[3] == triggerPinIn &&
+	if (sensor_container[2] == INNERGPIOPIN &&
+		sensor_container[3] == INNERGPIOPIN &&
 		sensor_level_container[2] == 1 &&
 		sensor_level_container[3] == 0)
 	{
