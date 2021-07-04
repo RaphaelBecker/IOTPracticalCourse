@@ -1,0 +1,7 @@
+{
+    "idf.flashType": "UART",
+    "idf.portWin": "COM4",
+    "files.associations": {
+        "*.ipp": "c"
+    }
+}
