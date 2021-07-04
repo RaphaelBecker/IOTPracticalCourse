@@ -41,7 +41,7 @@ void ping()
 {
 	ESP_LOGI(TAG, "Command: ping");
 	gpio_set_level(CONFIG_LED_GPIO, 1);
-	vTaskDelay(2500 / portTICK_PERIOD_MS);
+	vTaskDelay(1500 / portTICK_PERIOD_MS);
 	gpio_set_level(CONFIG_LED_GPIO, 0);
 	vTaskDelay(100 / portTICK_PERIOD_MS);
 	//expected outcome no change

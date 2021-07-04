@@ -58,6 +58,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             if (event->data_len == 4 && (strncmp(event->data, "ping", 4) == 0))
             {
                 ping();
+                time_t now;
+                time(&now);
+                last_ping = (long long) now;
+                printf("Last ping: %lld\n",last_ping);
             }
             else if (event->data_len == 5 && strncmp(event->data, "enter", 5) == 0)
             {

@@ -19,4 +19,6 @@ volatile uint8_t internalCount;
 uint8_t triggerPinInFlag;
 uint8_t triggerPinOutFlag;
 
+long long last_ping;
+
 #endif

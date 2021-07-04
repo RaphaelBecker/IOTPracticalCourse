@@ -39,6 +39,19 @@ static void restartDevice()
 	}
 }
 
+//Check every 10 minutes if we are still receiving mqtt events, if not - restart device
+static void makeSureWeAreAlive()
+{
+	vTaskDelay(600000 / portTICK_PERIOD_MS);
+	time_t now;
+    time(&now);
+	if (now-last_ping>480000)
+	{
+		printf("Lost connection to MQTT Topic - restarting!\n");
+		esp_restart();
+	}
+}
+
 
 void app_main(void)
 {
@@ -120,4 +133,6 @@ void app_main(void)
 
 	//restarts the device at 3am every day
 	xTaskCreate(restartDevice, "RestartAtNight", 2048, NULL, 20, NULL);
+
+	xTaskCreate(makeSureWeAreAlive, "makeSureWeAreAlive", 2048, NULL, 20, NULL);
 }
