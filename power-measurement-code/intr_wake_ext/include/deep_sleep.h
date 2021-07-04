@@ -14,7 +14,7 @@
 #define WAKE_UP_INTERVAL_S 15
 #define S_TO_US_FACTOR 1000000
 
-//#define DEEP_SLEEP
+#define DEEP_SLEEP
 
 void print_slept_time(void);
 void create_sleep_timer(void);

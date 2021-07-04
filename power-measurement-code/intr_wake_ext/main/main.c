@@ -59,8 +59,8 @@ static void gpio_task(void *_)
 // #### pattern definition ####:
 // enter_pattern_0:
 
-#define OUTERGPIOPIN 25
-#define INNERGPIOPIN 4
+#define OUTERGPIOPIN GPIO_PIN_1
+#define INNERGPIOPIN GPIO_PIN_2
 
 int32_t sensor_enter_pattern_0[4] = {OUTERGPIOPIN, INNERGPIOPIN, OUTERGPIOPIN, INNERGPIOPIN};
 int32_t sensor_enter_level_pattern_0[4] = {1, 1, 0, 0};
@@ -257,7 +257,7 @@ static void detect_crossing_barrier_by_pattern(int64_t timestamp)
 static int counting(gpio_evt_msg message)
 {
     //TODO: intergrate your cornercase handler
-
+#ifndef SAMPLECODE
     shift_to_left(sensor_level_container, 4, message.level);
 	shift_to_left(sensor_container, 4, message.pin);
     shift_to_left_long(sensor_timestamps, 4, message.timestamp);
@@ -265,7 +265,7 @@ static int counting(gpio_evt_msg message)
     detect_crossing_barrier_by_pattern(message.timestamp);
 
     return 0;
-#ifdef SAMPLECODE
+#else
     //following is a sample code:
     static int8_t transition_table[][4] = {
         //event: pin1-fall pin1-rise pin2-fall pin2-rise
@@ -401,7 +401,7 @@ void app_main(void)
         if (count_data_n)
         {
             start_wifi();
-            start_mqtt(&client);
+            //start_mqtt(&client);
             publish_rtc_data();
         }
         else

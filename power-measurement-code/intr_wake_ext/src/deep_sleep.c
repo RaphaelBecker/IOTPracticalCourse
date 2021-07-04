@@ -43,7 +43,7 @@ void restart_sleep_timer(void)
 {
     if (sleep_timer == NULL)
     {
-        ESP_LOGW(TAG, "sleep tiemr is not created, igore");
+        ESP_LOGW(TAG, "sleep timer is not created, ignore");
     }
     else
     {
