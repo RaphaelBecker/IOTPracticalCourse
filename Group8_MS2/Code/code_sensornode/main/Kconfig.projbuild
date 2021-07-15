@@ -1,0 +1,113 @@
+menu "Room Controller Configuration"
+
+    config LED_GPIO
+        int "LED GPIO Pin"
+        range 0 34
+        default 19
+        help
+            GPIO pin of the LED
+
+    config WIFI_SSID
+        string "Wifi SSID"
+        default "wifi_ssid"
+        help
+            Name of the 2.4GHz Wifi to connect to
+
+    config WIFI_PASS
+        string "Wifi Password"
+        default "wifi_pass"
+        help
+            Password for the Wifi Network
+
+    config BROKER_URL
+        string "MQTT Broker URL"
+        default "mqtt://user1:h8y98UyhX273X6tT@iotplatform.caps.in.tum.de:1885"
+        help
+            URL of an mqtt broker which this example connects to.
+
+    config MQTT_TOPIC
+        string "MQTT Topic Name"
+        default "ROOM_EVENTS"
+        help
+            Topic to listen to for room events
+
+        
+    config BROKER_CERTIFICATE_OVERRIDE
+        string "Broker certificate override"
+        default ""
+        help
+            Please leave empty if broker certificate included from a textfile; otherwise fill in a base64 part of PEM
+            format certificate
+        
+    config BROKER_CERTIFICATE_OVERRIDDEN
+        bool
+        default y if BROKER_CERTIFICATE_OVERRIDE != ""
+     
+    config BROKER_BIN_SIZE_TO_SEND
+    # This option is not visible and is used only to set parameters for example tests
+    # Here we configure the data size to send and to be expected in the python script
+        int
+        default 20000
+
+endmenu
+
+menu "MQTT-LoginDetails"
+    config IOT_MQTT_ADDRESS
+        string "iot platform mqtt broker uri (without port)"
+        default "mqtt://131.159.35.132"
+        help
+            self explanatory!
+    
+    config IOT_MQTT_PORT
+        int "iot platform port"
+        default 1883
+        help
+            self explanatory
+
+    config IOT_MQTT_DEVICEKEY
+        string "iot platform java token"
+        default ""
+        help
+            Access token for device to push data
+
+    config IOT_MQTT_USERNAME
+        string "mqtt username (usually JWT)"
+        default "JWT"
+        help
+            IOT MQTT broker username
+
+    config IOT_USERNAME
+        string "iot platform username"
+        default "group8_2021_ss"
+        help
+            Username that is also used to login to the webinterface
+    
+    config IOT_DEVICEID
+        int "iot platform device id"
+        default 0
+        help
+            Device ID for the device you want to push info to (obtain by downloading device key)
+
+    config IOT_USER_DEVICEID
+        string "iot platform <user>_<deviceid>"
+        default ""
+        help
+            used for the mqtt channel
+
+    config SENSOR_ID
+        string "iot platform count sensor id"
+        default ""
+        help
+            used to initialize the counter on restarts
+
+
+endmenu
+
+menu ELASTICSEARCH
+    config WEB_CONSUMER_TOKEN
+        string "iot consumer token"
+        default ""
+        help
+            iot consumer token with access to the count sensor id
+
+endmenu

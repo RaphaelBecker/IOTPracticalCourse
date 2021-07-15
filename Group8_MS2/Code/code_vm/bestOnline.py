@@ -1,32 +1,16 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 import pandas as pd
-import pickle
-import io
 
 import json
 import requests
-import math
 import paho.mqtt.client as mqtt
 
 from datetime import datetime
-from datetime import timedelta
 
 from dateutil.parser import parse 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import pandas as pd
 
-from pylab import rcParams
-import statsmodels.api as sm
-from statsmodels.tsa.stattools import acf, pacf
-
-from sklearn.metrics import mean_squared_error, accuracy_score
-
 from time import time
-import re
 
 def resample(data):
   data = data.sort_values('timestamp')
