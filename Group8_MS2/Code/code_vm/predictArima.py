@@ -135,7 +135,7 @@ def main(params):
         payload_string = json.dumps(payload)
         client1.publish("44_119",payload_string)
         client1.disconnect()
-        publish_message(kafka_producer, "predictions", "testing")
+        publish_message(kafka_producer, "predictions", payload_string)
 
     
     
